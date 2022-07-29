@@ -4,7 +4,7 @@
 
 # Create a new stack project
 ## Preface
-Since GHC 9.0.2 is not compatible with HLS 1.7.0.0 and Stack 2.7.3, you will need to force Stack to use a compatible version og GHC such as 8.10.7 (which is the one recommended by GHCup).
+Since GHC 9.0.2 is not compatible with HLS 1.7.0.0 and Stack 2.7.3, you will need to force Stack to use a compatible version og GHC such as 8.10.7 (which is the one recommended by GHCup). This may issue some errors, but there are working solutions. Here's mine.
 
 ## How to solve?
 In order to use a fully functional Stack configuration, you'll need to:
