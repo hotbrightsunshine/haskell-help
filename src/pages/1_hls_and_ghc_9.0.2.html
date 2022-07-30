@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Problemi con la configurazione Stack, HLS e GHC 9.0.2 </title>
+</head>
+<body>
+    <h1>
+        Creazione di un progetto - Problemi con le configurazioni di Stack, HLS e GHC 9.0.2
+    </h1>
+    <p>
+        Dato che questo problema era qualcosa che mi stava assillando da molto tempo, ho deciso di raccogliere
+        e di spiegarlo qui, in modo che sia accessibile alle persone che conoscono questo sito. 
+    </p>
+    <p>
+        In seguito all'aggiornamento del Haskell Language Server alla versione 1.7.0.0, è stata compromessa la sua
+        funzionalità con la versione di GHC 9.0.2. Questo risultava in ripetuti crash del server di lingua che
+        rendeva inutilizzabile l'applicativo,  a molti utile per lavorare più fluidamente con il linguaggio. 
+
+        Utilizzare la versione di GHC 8.10.7 potrebbe risolvere il problema, ma a quanto pare non lo fa. Infatti, Stack, un
+        build-tool basato su Cabal, non utilizza la versione di GHC installata sulla propria macchina, 
+        bensì le versioni messe a disposizione da Stackage. Queste possono variare, ma il caso vuole 
+        che venga installata proprio la versione di GHC 9.0.2, incompatibile, come previo detto, con l'ultima versione
+        raccomandata da GHCup.
+    </p>
+
+    <p>
+        <i>Per controllare quale versione di GHC è stata installata nel vostro progetto di Stack, potete visualizzare
+            il file <span>stack.yaml</span> alla voce <span>resolver</span>.
+        </i> 
+    </p>
+</body>
+</html>
+
+# Create a new stack project
+## Preface
+Since GHC 9.0.2 is not compatible with HLS 1.7.0.0 and Stack 2.7.3, you will need to force Stack to use a compatible version og GHC such as 8.10.7 (which is the one recommended by GHCup). This may issue some errors, but there are working solutions. Here's mine.
+
+## How to solve?
+In order to use a fully functional Stack configuration, you'll need to:
+
+- **Create a `hie.yaml` file as follows:**
+    ```
+    cradle:
+        stack:
+    ```
+    To not have issues with cradles and your HLS
+
+- **Add the following line to your `config.yaml` file (usually located in ~/.stack/config.yaml):**
+    ```
+    allow-newer: true
+    ```
+    To make the following step work. This is suggested by Stack.
+
+- **Change the `resolver` entry in the `stack.yaml` file as follows:**
+    ```
+    resolver: 
+        lts-18.28 (this is just an example)
+    ```
+    That is because you need to specify which GHC version to use. Stack will download that from Stackage, so you'll need to check which is the version of your GH Compiler that corrisponds to the one in the Stackage database.
+
+- **If you have issues with your *standard* ``Setup.hs`` file, add the following line to the dependencies in your `package.yaml`:**
+    ```
+    - Cabal >= 3.2.1.0
+    ```
+
