@@ -1,3 +1,4 @@
 # haskell-help
 
-🗝️ Source code of [[https://haskell-help.surge.sh/][this website]].
+- Source code of my `haskell-help` website.
+- URL: https://haskell-help.surge.sh/
