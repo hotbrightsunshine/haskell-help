@@ -1,66 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Problemi con la configurazione Stack, HLS e GHC 9.0.2 </title>
-</head>
-<body>
+<html lang="">
+  <head>
+    <link rel="stylesheet" href="../styles/master.css">
+    <meta charset="utf-8">
+    <title>haskell-help - 
+        Problemi con la configurazione Stack, HLS e GHC 9.0.2 
+    </title>
+  </head>
+  <body >
     <h1>
         Creazione di un progetto - Problemi con le configurazioni di Stack, HLS e GHC 9.0.2
     </h1>
-    <p>
+    <p class="p">
         Dato che questo problema era qualcosa che mi stava assillando da molto tempo, ho deciso di raccogliere
-        e di spiegarlo qui, in modo che sia accessibile alle persone che conoscono questo sito. 
+        qualche informazione e di spiegarlo qui, in modo che sia accessibile alle persone che conoscono questo sito. 
+    </p>
+    <p class="p">
+        In seguito all'aggiornamento del Haskell Language Server alla versione 1.7.0.0, è stata compromessa la sua
+        funzionalità con la versione di GHC 9.0.2 
+        (Fonte: <a href="https://www.reddit.com/r/haskell/comments/ucmo1t/ann_haskell_language_server_1700/">Reddit</a>). 
+        
+    </p>
+
+
+    
+    <p>
+        Questo risultava in ripetuti crash del server di lingua che
+        rendeva inutilizzabile l'applicativo,  a molti utile per lavorare più fluidamente 
+        nel proprio ambiente di sviluppo.
+
+        Viene quindi naturale pensare di cambiare versione di GHC installata.
+        Non sarebbe forse quello lo scopo del tool GHCup?
     </p>
     <p>
-        In seguito all'aggiornamento del Haskell Language Server alla versione 1.7.0.0, è stata compromessa la sua
-        funzionalità con la versione di GHC 9.0.2. Questo risultava in ripetuti crash del server di lingua che
-        rendeva inutilizzabile l'applicativo,  a molti utile per lavorare più fluidamente con il linguaggio. 
-
         Utilizzare la versione di GHC 8.10.7 potrebbe risolvere il problema, ma a quanto pare non lo fa. Infatti, Stack, un
         build-tool basato su Cabal, non utilizza la versione di GHC installata sulla propria macchina, 
-        bensì le versioni messe a disposizione da Stackage. Queste possono variare, ma il caso vuole 
+        bensì le versioni messe a disposizione da Stackage
+        (Avrei potuto spiegarlo male. Se volete controllare, potete leggere 
+        <a href="2_conversazione_con_admin_haskell_matrix.html">la mia conversazione</a>
+        sul server matrix di Haskell con un amministratore, che mi ha aiutato a risolvere il problema).
+        
+        Queste possono variare, ma il caso vuole 
         che venga installata proprio la versione di GHC 9.0.2, incompatibile, come previo detto, con l'ultima versione
         raccomandata da GHCup.
     </p>
 
-    <p>
+
+    <p class="p">
         <i>Per controllare quale versione di GHC è stata installata nel vostro progetto di Stack, potete visualizzare
-            il file <span>stack.yaml</span> alla voce <span>resolver</span>.
+            il file <span class="code">stack.yaml</span> alla voce <span class="code">resolver</span>.
+            Ad esempio,
+            <div class="codeb">
+resolver: 
+    lts-18.28
+            </div>
         </i> 
     </p>
-</body>
-</html>
 
-# Create a new stack project
-## Preface
-Since GHC 9.0.2 is not compatible with HLS 1.7.0.0 and Stack 2.7.3, you will need to force Stack to use a compatible version og GHC such as 8.10.7 (which is the one recommended by GHCup). This may issue some errors, but there are working solutions. Here's mine.
+    <p>
+        Quindi, per ovviare a ciò, è necessario cambiare la versione di 
+        GHC che utilizza Stack. 
+        Se lo si fa, è possibile che Stack richieda di settare una nuova
+        impostazione nel suo file di configurazione chiamata
+        <span class="code">allow-newer</span>. Fatelo, permette solamente
+        di utilizzare nuove versioni LTS o Snapshot di GHC. 
+    </p>
 
-## How to solve?
-In order to use a fully functional Stack configuration, you'll need to:
+    <p>
+        Se tutto va bene, la vostra configurazione Stack - GHC dovrebbe funzionare
+        correttamente e compilare i pacchetti che vi servono.
+    </p>
 
-- **Create a `hie.yaml` file as follows:**
-    ```
-    cradle:
+    <h2>Problemi con HLS, Haskell Language Server</h2>
+
+    <p>
+        È molto probabile che a questo punto potrete incontrare
+        degli errori illeggibili del server di lingua di Haskell. 
+    </p>
+
+    <p>
+        Prima di tutto, assicuratevi di avere nella directory <i>root</i>
+        del vostro progetto, un file <span class="code">hie.yaml</span>
+        con dentro scritto:
+    </p>
+
+    <div class="codeb">
+cradle:
         stack:
-    ```
-    To not have issues with cradles and your HLS
+    </div>
 
-- **Add the following line to your `config.yaml` file (usually located in ~/.stack/config.yaml):**
-    ```
-    allow-newer: true
-    ```
-    To make the following step work. This is suggested by Stack.
 
-- **Change the `resolver` entry in the `stack.yaml` file as follows:**
-    ```
-    resolver: 
-        lts-18.28 (this is just an example)
-    ```
-    That is because you need to specify which GHC version to use. Stack will download that from Stackage, so you'll need to check which is the version of your GH Compiler that corrisponds to the one in the Stackage database.
+    <p>
+        Ora, dire una cosa del genere mi farebbe fare brutta figura, tuttavia, 
+        ad essere onesto, non ho la minima idea del perché viene 
+        consigliato di fare un file del genere. 
+        <br>
+        Funziona, e quindi lo faccio, ma non ne capisco il senso! :-)
+    </p>
 
-- **If you have issues with your *standard* ``Setup.hs`` file, add the following line to the dependencies in your `package.yaml`:**
-    ```
-    - Cabal >= 3.2.1.0
-    ```
+    <h3>
+        Multi Cradle: No prefixes matched - Errori con il file Setup.hs
+    </h3>
+
+    <p>
+        Se, dopo aver creato il file <span class="code">hie.yaml</span>
+        avete ancora problemi con il server di lingua, potete provare a 
+        leggere questo paragrafo. 
+    </p>
+
+    <p>
+        Se l'HLS lamenta di dipendenze che mancano nel file Setup.hs, 
+        provate ad
+        inserire nelle dipendenze di Stack (nel file package.yaml) questa riga qua:
+
+<div class="codeb">
+- Cabal >= 3.2.1.0
+
+</div>
+
+    </p>
+
+  </body>
+</html>
 

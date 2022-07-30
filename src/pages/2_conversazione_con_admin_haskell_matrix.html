@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <link rel="stylesheet" href="../styles/master.css">
+    <meta charset="utf-8">
+    <title>haskell-help - 
+        Conversazione con l'admin del server Matrix di Haskell
+    </title>
+  </head>
+  <body >
+    <h1>Conversazione con l'admin del server Matrix di Haskell</h1>
+
+    <div class="message">
+        <p>
+            francesco 🦕
+        </p>
+        <p>
+            Thank you! Basically, it is about my GHCup configuration. 
+            Because of <a href="https://www.reddit.com/r/haskell/comments/ucmo1t/ann_haskell_language_server_1700/">
+                this bug
+            </a>
+            I am unable to use GHC 9.0.2. 
+            <br>
+            In fact, I have installed with GHCup the recommended version (which is 8.10.7), but Stack still seems to use the other one, messing with HLS, which crashes. 
+            <br>
+            I have tried using <span class="code">system-ghc: true</span>,
+            and also tried to follow <a href="https://stackoverflow.com/questions/55878447/how-to-i-change-the-default-ghc-compiler-version-on-stack">
+                this thread on StackOverflow 
+            </a> 
+            , but that doesn't seem to help in any way. 
+            <br>
+            When I declare the Gloss dependency (the one that I am working with), stack enters in a sort of "dependecy hell".   
+            <br>
+            I have also tried to change the resolver in the stack.yaml, but that doesn't seem to help. It issues the same "dependency hell".
+            If it helps, I'll leave down below the error message.
+            <br>
+            I have tried working on this error for a lot of time, but I haven't figured out any solution to this problem. 
+            Trying to help and fix this bug would be awesome, but I don't have the knowledge required in order to do so, so I am asking an help to you.
+            <br>
+            Anyways, the "dependency hell" of which I'm talking about, is something similar to this one:        
+        </p>
+        <div class="codeb">
+➜  amaranth stack build
+
+Error: While constructing the build plan, the following exceptions were
+encountered:
+
+In the dependencies for amaranth-0.1.0.0:
+    gloss must match >=1.13.2.2, but the stack configuration has no specified
+            version  (latest matching version is 1.13.2.2)
+needed since amaranth is a build target.
+
+Some different approaches to resolving this:
+
+    * Recommended action: try adding the following to your extra-deps
+    in /home/francesco/Programmazione/Haskell/amaranth/stack.yaml:
+
+- gloss-1.13.2.2@sha256:cdb17d6c2f7cc32dc0893e60d6c047f12ad...
+
+Plan construction failed.
+        </div>
+    </div>
+
+    <div class="message">
+        <p>
+            sm
+        </p>
+        <p>
+            is amaranth a public project you can share a link for ? if not you may want to paste the stack.yaml and package.yaml/cabal file
+        </p>
+    </div>
+
+<div class="message">
+    <p>
+        francesco 🦕
+    </p>
+    <p>
+        oh no, it is the name of my personal project. For sure.
+    </p>
+    <div class="codeb">
+resolver:
+compiler: ghc-8.10.7
+
+packages:
+- .
+    </div>
+</div>
+
+<div class="message">
+    <p>
+        sm
+    </p>
+    <p>
+        that's ok. You should change your resolver to an lts (or nightly) snapshot, not ghc
+    </p>
+    <p>
+        eg if you need ghc 8.10.7, look for the latest snapshot for that ghc version on stackage.org, and specify that as resolver:. Don't specify compiler:
+    </p>
+    <div class="codeb">
+resolver: lts-18.28
+    </div>
+</div>
+
+<div class="message">
+    <p>
+        francesco 🦕
+    </p>
+    <p>
+        Okay, thank you. If i hit stack build, it issues the same output, but with a new "suggestion".
+    </p>
+    <div class="codeb">
+Error: While constructing the build plan, the following exceptions were
+encountered:
+
+In the dependencies for amaranth-0.1.0.0:
+    gloss-1.13.2.1 from stack configuration does not match >=1.13.2.2 
+                    (latest matching version is 1.13.2.2)
+needed since amaranth is a build target.
+
+Some different approaches to resolving this:
+
+<b>* Set 'allow-newer: true'</b> 
+...
+
+[...]
+
+Plan construction failed.
+    </div>
+    <p>
+        Okay, I set that and now it seems to be compiling all of the Gloss dependencies
+    </p>
+</div>
+
+<div class="message">
+    <p>
+        francesco 🦕
+    </p>
+    <p>
+        I compiled and seems to be working! Thank you @sm
+        for your help.
+        There is another issue now, but I don't know what is its cause. 
+        Basically, HLS notices an error in my Setup.hs file, saying
+    </p>
+    <div class="codeb">
+Multi Cradle: No prefixes matched
+pwd: /home/francesco/Programmazione/Haskell/amaranth
+filepath: /home/francesco/Programmazione/Haskell/amaranth/Setup.hs
+prefixes:
+("./src",Stack {component = Just "amaranth:lib", stackYaml = Nothing})
+("./app/Main.hs",Stack {component = Just "amaranth:exe:amaranth-exe", stackYaml = Nothing})
+("./app/Paths_amaranth.hs",Stack {component = Just "amaranth:exe:amaranth-exe", stackYaml = Nothing})
+("./test",Stack {component = Just "amaranth:test:amaranth-test", stackYaml = Nothing})
+    </div>
+    <p>
+        with my <b>Setup.hs</b> being
+    </p>
+    <div class="codeb">
+import Distribution.Simple
+main = defaultMain
+    </div>
+
+    <p>
+        OK, finally I managed to make it work. For anyone interested in this: 
+    </p>
+    <p>
+        <a href="https://www.reddit.com/r/haskell/comments/418tt8/could_not_find_module_distributionsimple_on/ ">
+            This</a> was the thread I read in order to make the whole thing work.
+        <br>
+    I added 
+    </p>
+    <div class="codeb">
+- Cabal >= 3.2.1.0
+    </div>
+    <p>
+     to my package.yaml dependencies.
+    </p>
+
+</div>
+
+
+
+
+  </body>
+</html>

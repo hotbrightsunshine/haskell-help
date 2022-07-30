@@ -1,0 +1,20 @@
+.codeb {
+    border: 1px black solid;
+    padding: 1rem;
+    font-family: monospace;
+    white-space: pre;
+}
+
+.code {
+    font-family: monospace;
+}
+
+p, h1, h2, h3 {
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.message {
+    border: 1px black solid;
+    padding: 1rem;
+    margin: 1rem;
+}
